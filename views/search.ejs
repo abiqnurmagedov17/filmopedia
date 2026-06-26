@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Cinemate</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">🎬 Cinemate</a>
+      <div class="nav-links">
+        <a href="/movies/trending">Trending</a>
+        <a href="/movies/popular">Popular</a>
+        <a href="/movies/top">Top Rated</a>
+        <a href="/movies/upcoming">Upcoming</a>
+        <a href="/movies/now-playing">Now Playing</a>
+      </div>
+      <form action="/search" class="search-form">
+        <input type="text" name="q" placeholder="Cari film..." required>
+        <button type="submit">🔍</button>
+      </form>
+    </nav>
+  </header>
+
+  <main>
+    <section class="movie-list">
+      <h1>Hasil Pencarian</h1>
+      <% if (query) { %>
+        <p class="search-query">Menampilkan hasil untuk: "<%= query %>"</p>
+      <% } %>
+      
+      <% if (movies.length === 0) { %>
+        <p class="empty-state">Tidak ada film ditemukan.</p>
+      <% } else { %>
+        <div class="movie-grid">
+          <% movies.forEach(movie => { %>
+            <a href="/movie/<%= movie.id %>" class="movie-card">
+              <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                   alt="<%= movie.original_title %>">
+              <div class="card-info">
+                <h3><%= movie.original_title %></h3>
+                <span>⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Cinemate - Data dari TMDB</p>
+  </footer>
+</body>
+</html>
