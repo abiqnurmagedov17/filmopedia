@@ -3,55 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Search - Cinemate</title>
-  <link rel="stylesheet" href="/styles.css">
+  <title>Search — FilmPedia</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="/" class="logo">🎬 Cinemate</a>
-      <div class="nav-links">
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Film<span>Pedia</span></a>
+      <nav class="nav-links" id="navLinks">
         <a href="/movies/trending">Trending</a>
         <a href="/movies/popular">Popular</a>
         <a href="/movies/top">Top Rated</a>
         <a href="/movies/upcoming">Upcoming</a>
         <a href="/movies/now-playing">Now Playing</a>
+        <a href="/movies/discover">Discover</a>
+      </nav>
+      <div class="nav-actions">
+        <form action="/search" class="search-form">
+          <input type="text" name="q" placeholder="Cari film..." value="<%= query || '' %>">
+          <button type="submit">Cari</button>
+        </form>
+        <button class="hamburger" id="hamburger">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <form action="/search" class="search-form">
-        <input type="text" name="q" placeholder="Cari film..." required>
-        <button type="submit">🔍</button>
-      </form>
-    </nav>
+    </div>
   </header>
 
   <main>
-    <section class="movie-list">
-      <h1>Hasil Pencarian</h1>
-      <% if (query) { %>
-        <p class="search-query">Menampilkan hasil untuk: "<%= query %>"</p>
-      <% } %>
-      
-      <% if (movies.length === 0) { %>
-        <p class="empty-state">Tidak ada film ditemukan.</p>
-      <% } else { %>
-        <div class="movie-grid">
-          <% movies.forEach(movie => { %>
-            <a href="/movie/<%= movie.id %>" class="movie-card">
-              <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
-                   alt="<%= movie.original_title %>">
-              <div class="card-info">
-                <h3><%= movie.original_title %></h3>
-                <span>⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
-              </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } %>
+    <section class="section-band">
+      <div class="container">
+        <h1 style="margin-bottom:var(--space-sm);">🔍 Hasil Pencarian</h1>
+        
+        <% if (query) { %>
+          <p style="color:var(--muted);margin-bottom:var(--space-lg);">
+            Menampilkan hasil untuk: "<strong><%= query %></strong>"
+          </p>
+        <% } %>
+
+        <% if (movies.length === 0 && query) { %>
+          <div class="empty" style="text-align:center;padding:var(--space-xxl) 0;color:var(--muted);">
+            <div style="font-size:48px;margin-bottom:var(--space-md);">😕</div>
+            <h3 style="font-family:var(--font-body);font-weight:500;">Tidak ada film ditemukan</h3>
+            <p>Coba dengan kata kunci lain.</p>
+          </div>
+        <% } else if (!query) { %>
+          <div class="empty" style="text-align:center;padding:var(--space-xxl) 0;color:var(--muted);">
+            <div style="font-size:48px;margin-bottom:var(--space-md);">🔎</div>
+            <h3 style="font-family:var(--font-body);font-weight:500;">Cari film favoritmu</h3>
+            <p>Ketik judul film di atas.</p>
+          </div>
+        <% } else { %>
+          <div class="movie-grid">
+            <% movies.forEach(movie => { %>
+              <a href="/movie/<%= movie.id %>" class="movie-card">
+                <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                     alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+                <div class="movie-card-info">
+                  <h3><%= movie.original_title %></h3>
+                  <div class="meta">
+                    <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                    <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+                  </div>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>© 2026 Cinemate - Data dari TMDB</p>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">Film<span>Pedia</span></a>
+          <p>Discover movies, explore genres, and find your next favorite film.</p>
+        </div>
+        <div>
+          <h4>Kategori</h4>
+          <a href="/movies/trending">Trending</a>
+          <a href="/movies/popular">Popular</a>
+          <a href="/movies/top">Top Rated</a>
+        </div>
+        <div>
+          <h4>Lainnya</h4>
+          <a href="/search">Cari</a>
+          <a href="/movies/discover">Discover</a>
+        </div>
+        <div>
+          <h4>Tentang</h4>
+          <a href="#">Ditenagai TMDB</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 FilmPedia</span>
+        <span>Data dari TMDB</span>
+      </div>
+    </div>
   </footer>
+
+  <script>
+    document.getElementById('hamburger')?.addEventListener('click', function() {
+      document.getElementById('navLinks')?.classList.toggle('open');
+    });
+  </script>
+
 </body>
 </html>
