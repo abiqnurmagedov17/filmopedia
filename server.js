@@ -8,14 +8,14 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
-// Setup EJS sebagai template engine
+// Setup EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Helper: fetch dari TMDB
+// ===== HELPER: FETCH TMDB =====
 async function fetchTMDB(endpoint, params = {}) {
   try {
     const response = await axios.get(`${TMDB_BASE}${endpoint}`, {
@@ -28,83 +28,185 @@ async function fetchTMDB(endpoint, params = {}) {
   }
 }
 
-// ============= ROUTES =============
+// ===== ROUTES =====
 
-// Halaman Utama
+// 1. HOMEPAGE
 app.get('/', async (req, res) => {
   try {
-    const [trending, nowPlaying, topRated] = await Promise.all([
+    const [trending, nowPlaying, topRated, upcoming, popular] = await Promise.all([
       fetchTMDB('/trending/movie/day', { page: 1 }),
       fetchTMDB('/movie/now_playing', { page: 1 }),
-      fetchTMDB('/movie/top_rated', { page: 1 })
+      fetchTMDB('/movie/top_rated', { page: 1 }),
+      fetchTMDB('/movie/upcoming', { page: 1 }),
+      fetchTMDB('/movie/popular', { page: 1 })
     ]);
 
     res.render('index', {
       trending: trending?.results?.slice(0, 10) || [],
       nowPlaying: nowPlaying?.results?.slice(0, 4) || [],
       topRated: topRated?.results?.slice(0, 4) || [],
+      upcoming: upcoming?.results?.slice(0, 4) || [],
+      popular: popular?.results?.slice(0, 4) || [],
       hero: nowPlaying?.results?.slice(0, 5) || []
     });
   } catch (error) {
+    console.error('Homepage error:', error);
     res.status(500).send('Error loading homepage');
   }
 });
 
-// Daftar Film (Popular, Trending, Top Rated, Upcoming, Now Playing)
-app.get('/movies/:list', async (req, res) => {
-  const { list } = req.params;
-  const page = parseInt(req.query.page) || 1;
-  
-  const endpoints = {
-    popular: '/movie/popular',
-    trending: '/trending/movie/day',
-    top: '/movie/top_rated',
-    upcoming: '/movie/upcoming',
-    'now-playing': '/movie/now_playing'
-  };
-
-  const endpoint = endpoints[list];
-  if (!endpoint) return res.status(404).send('List not found');
-
+// 2. TRENDING
+app.get('/movies/trending', async (req, res) => {
   try {
-    const data = await fetchTMDB(endpoint, { page });
-    const title = list.replace('-', ' ').toUpperCase();
+    const page = parseInt(req.query.page) || 1;
+    const window = req.query.window === 'week' ? 'week' : 'day';
+    const data = await fetchTMDB(`/trending/movie/${window}`, { page });
     
     res.render('movies', {
       movies: data?.results?.slice(0, 8) || [],
-      title,
+      title: 'Trending',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
-      basePath: `/movies/${list}`
+      basePath: '/movies/trending',
+      window: window
     });
   } catch (error) {
-    res.status(500).send('Error loading movies');
+    console.error('Trending error:', error);
+    res.status(500).send('Error loading trending');
   }
 });
 
-// Detail Film
+// 3. POPULAR
+app.get('/movies/popular', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const data = await fetchTMDB('/movie/popular', { page });
+    
+    res.render('movies', {
+      movies: data?.results?.slice(0, 8) || [],
+      title: 'Popular',
+      currentPage: page,
+      totalPages: Math.min(data?.total_pages || 1, 500),
+      basePath: '/movies/popular',
+      window: 'day'
+    });
+  } catch (error) {
+    console.error('Popular error:', error);
+    res.status(500).send('Error loading popular');
+  }
+});
+
+// 4. TOP RATED
+app.get('/movies/top', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const data = await fetchTMDB('/movie/top_rated', { page });
+    
+    res.render('movies', {
+      movies: data?.results?.slice(0, 8) || [],
+      title: 'Top Rated',
+      currentPage: page,
+      totalPages: Math.min(data?.total_pages || 1, 500),
+      basePath: '/movies/top',
+      window: 'day'
+    });
+  } catch (error) {
+    console.error('Top Rated error:', error);
+    res.status(500).send('Error loading top rated');
+  }
+});
+
+// 5. UPCOMING
+app.get('/movies/upcoming', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const data = await fetchTMDB('/movie/upcoming', { page });
+    
+    res.render('movies', {
+      movies: data?.results?.slice(0, 8) || [],
+      title: 'Upcoming',
+      currentPage: page,
+      totalPages: Math.min(data?.total_pages || 1, 500),
+      basePath: '/movies/upcoming',
+      window: 'day'
+    });
+  } catch (error) {
+    console.error('Upcoming error:', error);
+    res.status(500).send('Error loading upcoming');
+  }
+});
+
+// 6. NOW PLAYING
+app.get('/movies/now-playing', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const data = await fetchTMDB('/movie/now_playing', { page });
+    
+    res.render('movies', {
+      movies: data?.results?.slice(0, 8) || [],
+      title: 'Now Playing',
+      currentPage: page,
+      totalPages: Math.min(data?.total_pages || 1, 500),
+      basePath: '/movies/now-playing',
+      window: 'day'
+    });
+  } catch (error) {
+    console.error('Now Playing error:', error);
+    res.status(500).send('Error loading now playing');
+  }
+});
+
+// 7. DISCOVER (Filter)
+app.get('/movies/discover', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const genre = req.query.genre;
+    const year = req.query.year;
+    const sort = req.query.sort || 'popularity.desc';
+    
+    const params = { page, sort_by: sort };
+    if (genre) params.with_genres = genre;
+    if (year) params.primary_release_year = year;
+    
+    const [data, genres] = await Promise.all([
+      fetchTMDB('/discover/movie', params),
+      fetchTMDB('/genre/movie/list')
+    ]);
+    
+    res.render('discover', {
+      movies: data?.results?.slice(0, 8) || [],
+      genres: genres?.genres || [],
+      currentPage: page,
+      totalPages: Math.min(data?.total_pages || 1, 500),
+      basePath: '/movies/discover',
+      selectedGenre: genre || null,
+      selectedYear: year || null,
+      selectedSort: sort
+    });
+  } catch (error) {
+    console.error('Discover error:', error);
+    res.status(500).send('Error loading discover');
+  }
+});
+
+// 8. MOVIE DETAIL
 app.get('/movie/:id', async (req, res) => {
   const { id } = req.params;
   
   try {
-    const [movie, credits, videos] = await Promise.all([
+    const [movie, credits, videos, similar, recommendations] = await Promise.all([
       fetchTMDB(`/movie/${id}`),
       fetchTMDB(`/movie/${id}/credits`),
-      fetchTMDB(`/movie/${id}/videos`)
+      fetchTMDB(`/movie/${id}/videos`),
+      fetchTMDB(`/movie/${id}/similar`, { page: 1 }),
+      fetchTMDB(`/movie/${id}/recommendations`, { page: 1 })
     ]);
 
     if (!movie) return res.status(404).send('Movie not found');
 
-    // Filter trailer YouTube
     const trailers = videos?.results?.filter(
       v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')
     ) || [];
-
-    // Similar & Recommendations
-    const [similar, recommendations] = await Promise.all([
-      fetchTMDB(`/movie/${id}/similar`, { page: 1 }),
-      fetchTMDB(`/movie/${id}/recommendations`, { page: 1 })
-    ]);
 
     res.render('movie', {
       movie,
@@ -114,11 +216,12 @@ app.get('/movie/:id', async (req, res) => {
       recommendations: recommendations?.results?.slice(0, 10) || []
     });
   } catch (error) {
+    console.error('Movie detail error:', error);
     res.status(500).send('Error loading movie detail');
   }
 });
 
-// Pencarian
+// 9. SEARCH
 app.get('/search', async (req, res) => {
   const query = req.query.q?.trim();
   
@@ -133,11 +236,12 @@ app.get('/search', async (req, res) => {
       query 
     });
   } catch (error) {
+    console.error('Search error:', error);
     res.status(500).send('Error searching');
   }
 });
 
-// API endpoint untuk genres (dipakai JavaScript client)
+// 10. API GENRES
 app.get('/api/genres', async (req, res) => {
   try {
     const data = await fetchTMDB('/genre/movie/list');
@@ -147,7 +251,7 @@ app.get('/api/genres', async (req, res) => {
   }
 });
 
-// API endpoint untuk discover (filter)
+// 11. API DISCOVER
 app.get('/api/discover', async (req, res) => {
   const { genre, year, sort, page = 1 } = req.query;
   
@@ -166,7 +270,7 @@ app.get('/api/discover', async (req, res) => {
   }
 });
 
-// Start server
+// ===== START =====
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
