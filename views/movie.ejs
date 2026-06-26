@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= movie.title %> — FilmPedia</title>
-  <link rel="stylesheet" href="/styles-claude.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
@@ -17,26 +17,27 @@
         <a href="/movies/top">Top Rated</a>
         <a href="/movies/upcoming">Upcoming</a>
         <a href="/movies/now-playing">Now Playing</a>
+        <a href="/movies/discover">Discover</a>
       </nav>
       <div class="nav-actions">
         <form action="/search" class="search-form">
           <input type="text" name="q" placeholder="Cari film...">
           <button type="submit">Cari</button>
         </form>
-        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        <button class="hamburger" id="hamburger">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
   </header>
 
   <main class="container movie-detail">
     <div class="detail-layout">
-      <!-- Poster -->
       <div class="detail-poster">
         <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
-             alt="<%= movie.title %>">
+             alt="<%= movie.title %>" onerror="this.src='/placeholder.jpg'">
       </div>
 
-      <!-- Content -->
       <div class="detail-content">
         <h1><%= movie.title %></h1>
         <% if (movie.tagline) { %>
@@ -69,7 +70,7 @@
             <% credits.cast.slice(0, 10).forEach(c => { %>
               <div class="cast-item">
                 <img src="https://image.tmdb.org/t/p/w185<%= c.profile_path %>" 
-                     alt="<%= c.name %>" onerror="this.src='/placeholder.png'">
+                     alt="<%= c.name %>" onerror="this.src='/placeholder.jpg'">
                 <div class="name"><%= c.name %></div>
                 <div class="character"><%= c.character %></div>
               </div>
@@ -99,7 +100,7 @@
             <% similar.slice(0, 8).forEach(m => { %>
               <a href="/movie/<%= m.id %>" class="movie-card">
                 <img src="https://image.tmdb.org/t/p/w185<%= m.poster_path %>" 
-                     alt="<%= m.original_title %>">
+                     alt="<%= m.original_title %>" onerror="this.src='/placeholder.jpg'">
                 <div class="movie-card-info">
                   <h3><%= m.original_title %></h3>
                   <div class="meta">
@@ -138,7 +139,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 FilmPedia — Inspired by Anthropic's design language</span>
+        <span>© 2026 FilmPedia</span>
         <span>Data dari TMDB</span>
       </div>
     </div>
