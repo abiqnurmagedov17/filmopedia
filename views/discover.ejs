@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover — FilmPedia</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Film<span>Pedia</span></a>
+      <nav class="nav-links" id="navLinks">
+        <a href="/movies/trending">Trending</a>
+        <a href="/movies/popular">Popular</a>
+        <a href="/movies/top">Top Rated</a>
+        <a href="/movies/upcoming">Upcoming</a>
+        <a href="/movies/now-playing">Now Playing</a>
+        <a href="/movies/discover">Discover</a>
+      </nav>
+      <div class="nav-actions">
+        <form action="/search" class="search-form">
+          <input type="text" name="q" placeholder="Cari film...">
+          <button type="submit">Cari</button>
+        </form>
+        <button class="hamburger" id="hamburger">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section-band">
+      <div class="container">
+        <h1 style="margin-bottom:var(--space-lg);">🔍 Discover Movies</h1>
+
+        <!-- Filter Form -->
+        <form action="/movies/discover" method="GET" style="display:flex;flex-wrap:wrap;gap:var(--space-md);margin-bottom:var(--space-xl);">
+          <select name="genre" style="padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--hairline);background:var(--canvas);">
+            <option value="">All Genres</option>
+            <% genres.forEach(g => { %>
+              <option value="<%= g.id %>" <%= String(selectedGenre) === String(g.id) ? 'selected' : '' %>>
+                <%= g.name %>
+              </option>
+            <% }) %>
+          </select>
+
+          <select name="year" style="padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--hairline);background:var(--canvas);">
+            <option value="">All Years</option>
+            <% const currentYear = new Date().getFullYear(); for (let y = currentYear; y >= 1970; y--) { %>
+              <option value="<%= y %>" <%= String(selectedYear) === String(y) ? 'selected' : '' %>>
+                <%= y %>
+              </option>
+            <% } %>
+          </select>
+
+          <select name="sort" style="padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--hairline);background:var(--canvas);">
+            <option value="popularity.desc" <%= selectedSort === 'popularity.desc' ? 'selected' : '' %>>Popularity</option>
+            <option value="vote_average.desc" <%= selectedSort === 'vote_average.desc' ? 'selected' : '' %>>Rating</option>
+            <option value="release_date.desc" <%= selectedSort === 'release_date.desc' ? 'selected' : '' %>>Release Date</option>
+            <option value="title.asc" <%= selectedSort === 'title.asc' ? 'selected' : '' %>>Title A-Z</option>
+          </select>
+
+          <button type="submit" class="btn-primary">Filter</button>
+          <a href="/movies/discover" class="btn-secondary">Reset</a>
+        </form>
+
+        <!-- Results -->
+        <div class="movie-grid">
+          <% movies.forEach(movie => { %>
+            <a href="/movie/<%= movie.id %>" class="movie-card">
+              <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                   alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+              <div class="movie-card-info">
+                <h3><%= movie.original_title %></h3>
+                <div class="meta">
+                  <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                  <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+
+        <% if (movies.length === 0) { %>
+          <p style="text-align:center;padding:var(--space-xl) 0;color:var(--muted);">Tidak ada film ditemukan dengan filter ini.</p>
+        <% } %>
+
+        <% if (totalPages > 1) { %>
+          <div class="pagination">
+            <% for (let i = 1; i <= Math.min(totalPages, 10); i++) { %>
+              <a href="/movies/discover?page=<%= i %><%= selectedGenre ? '&genre=' + selectedGenre : '' %><%= selectedYear ? '&year=' + selectedYear : '' %><%= '&sort=' + selectedSort %>" 
+                 class="<%= i === currentPage ? 'active' : '' %>">
+                <%= i %>
+              </a>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">Film<span>Pedia</span></a>
+          <p>Discover movies, explore genres, and find your next favorite film.</p>
+        </div>
+        <div>
+          <h4>Kategori</h4>
+          <a href="/movies/trending">Trending</a>
+          <a href="/movies/popular">Popular</a>
+          <a href="/movies/top">Top Rated</a>
+        </div>
+        <div>
+          <h4>Lainnya</h4>
+          <a href="/search">Cari</a>
+          <a href="/movies/discover">Discover</a>
+        </div>
+        <div>
+          <h4>Tentang</h4>
+          <a href="#">Ditenagai TMDB</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 FilmPedia</span>
+        <span>Data dari TMDB</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('hamburger')?.addEventListener('click', function() {
+      document.getElementById('navLinks')?.classList.toggle('open');
+    });
+  </script>
+
+</body>
+</html>
