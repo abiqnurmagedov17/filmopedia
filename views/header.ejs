@@ -1,0 +1,35 @@
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">Film<span>Pedia</span></a>
+    <nav class="nav-links" id="navLinks">
+      <button class="nav-close" id="navClose">✕</button>
+      <a href="/movies/trending" class="<%= currentPageNav === 'trending' ? 'active' : '' %>">Trending</a>
+      <a href="/movies/popular" class="<%= currentPageNav === 'popular' ? 'active' : '' %>">Popular</a>
+      <a href="/movies/top" class="<%= currentPageNav === 'top' ? 'active' : '' %>">Top Rated</a>
+      <a href="/movies/upcoming" class="<%= currentPageNav === 'upcoming' ? 'active' : '' %>">Upcoming</a>
+      <a href="/movies/now-playing" class="<%= currentPageNav === 'now-playing' ? 'active' : '' %>">Now Playing</a>
+      <a href="/movies/discover" class="<%= currentPageNav === 'discover' ? 'active' : '' %>">Discover</a>
+    </nav>
+    <div class="nav-actions">
+      <form action="/search" class="search-form">
+        <input type="text" name="q" placeholder="Cari film..." value="<%= typeof query !== 'undefined' ? query : '' %>">
+        <button type="submit">Cari</button>
+      </form>
+      <button class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  const navClose = document.getElementById('navClose');
+
+  hamburger?.addEventListener('click', () => navLinks?.classList.toggle('open'));
+  navClose?.addEventListener('click', () => navLinks?.classList.remove('open'));
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => navLinks?.classList.remove('open'));
+  });
+</script>
