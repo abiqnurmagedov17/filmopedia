@@ -3,12 +3,12 @@
     <a href="/" class="logo">Film<span>Pedia</span></a>
     <nav class="nav-links" id="navLinks">
       <button class="nav-close" id="navClose">✕</button>
-      <a href="/movies/trending" class="<%= currentPageNav === 'trending' ? 'active' : '' %>">Trending</a>
-      <a href="/movies/popular" class="<%= currentPageNav === 'popular' ? 'active' : '' %>">Popular</a>
-      <a href="/movies/top" class="<%= currentPageNav === 'top' ? 'active' : '' %>">Top Rated</a>
-      <a href="/movies/upcoming" class="<%= currentPageNav === 'upcoming' ? 'active' : '' %>">Upcoming</a>
-      <a href="/movies/now-playing" class="<%= currentPageNav === 'now-playing' ? 'active' : '' %>">Now Playing</a>
-      <a href="/movies/discover" class="<%= currentPageNav === 'discover' ? 'active' : '' %>">Discover</a>
+      <a href="/movies/trending" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'trending' ? 'active' : '' %>">Trending</a>
+      <a href="/movies/popular" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'popular' ? 'active' : '' %>">Popular</a>
+      <a href="/movies/top" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'top' ? 'active' : '' %>">Top Rated</a>
+      <a href="/movies/upcoming" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'upcoming' ? 'active' : '' %>">Upcoming</a>
+      <a href="/movies/now-playing" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'now-playing' ? 'active' : '' %>">Now Playing</a>
+      <a href="/movies/discover" class="<%= typeof currentPageNav !== 'undefined' && currentPageNav === 'discover' ? 'active' : '' %>">Discover</a>
     </nav>
     <div class="nav-actions">
       <form action="/search" class="search-form">
