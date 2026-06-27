@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FilmPedia — Discover Movies</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <%- include('header', { currentPageNav: 'home' }) %>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero-band">
+    <div class="container">
+      <% if (hero.length) { %>
+        <div class="hero-slide">
+          <img src="https://image.tmdb.org/t/p/original<%= hero[0].backdrop_path %>" 
+               alt="<%= hero[0].original_title %>" onerror="this.src='/placeholder.jpg'">
+          <div class="hero-overlay">
+            <div class="hero-content">
+              <h1><%= hero[0].original_title %></h1>
+              <div class="hero-meta">
+                <span class="rating">⭐ <%= hero[0].vote_average?.toFixed(1) || 'N/A' %></span>
+                <span><%= hero[0].release_date?.slice(0,4) || 'TBA' %></span>
+                <span><%= hero[0].runtime || '?' %> min</span>
+                <span class="badge-genre">🎬 Action</span>
+              </div>
+              <p class="overview"><%= hero[0].overview?.slice(0, 200) %>...</p>
+              <div class="hero-actions">
+                <a href="/movie/<%= hero[0].id %>" class="btn-primary">▶ Tonton Sekarang</a>
+                <a href="/movie/<%= hero[0].id %>" class="btn-hero-secondary">ℹ️ Detail</a>
+              </div>
+            </div>
+          </div>
+          <div class="hero-dots">
+            <% hero.forEach((_, i) => { %>
+              <button class="<%= i === 0 ? 'active' : '' %>" data-index="<%= i %>"></button>
+            <% }) %>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="hero-slide" style="background:var(--surface-dark);min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--on-dark-soft);">
+          <p>Tidak ada film tersedia</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- ===== TRENDING (Reel) ===== -->
+  <section class="section-band">
+    <div class="container">
+      <div class="section-header">
+        <h2>🔥 Trending</h2>
+        <a href="/movies/trending" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="movie-reel">
+        <% trending.forEach((movie, index) => { %>
+          <a href="/movie/<%= movie.id %>" class="movie-card">
+            <% if (index < 3) { %>
+              <span class="badge badge-trending">🔥 Trending</span>
+            <% } %>
+            <img src="https://image.tmdb.org/t/p/w185<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div class="movie-card-info">
+              <h3><%= movie.original_title %></h3>
+              <div class="meta">
+                <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== POPULAR ===== -->
+  <section class="section-band-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>⭐ Popular</h2>
+        <a href="/movies/popular" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="movie-grid">
+        <% popular.forEach((movie, index) => { %>
+          <a href="/movie/<%= movie.id %>" class="movie-card">
+            <% if (index === 0) { %>
+              <span class="badge badge-hot">🔥 Hot</span>
+            <% } %>
+            <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div class="movie-card-info">
+              <h3><%= movie.original_title %></h3>
+              <div class="meta">
+                <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+              </div>
+              <div class="genre-chips">
+                <span class="chip">Action</span>
+                <span class="chip">Drama</span>
+              </div>
+            </div>
+            <div class="card-hover-overlay">
+              <p><%= movie.overview?.slice(0, 100) %>...</p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NOW PLAYING ===== -->
+  <section class="section-band">
+    <div class="container">
+      <div class="section-header">
+        <h2>📽️ Now Playing</h2>
+        <a href="/movies/now-playing" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="movie-grid">
+        <% nowPlaying.forEach((movie, index) => { %>
+          <a href="/movie/<%= movie.id %>" class="movie-card">
+            <span class="badge badge-new">Baru</span>
+            <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div class="movie-card-info">
+              <h3><%= movie.original_title %></h3>
+              <div class="meta">
+                <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CORAL CALLOUT ===== -->
+  <div class="container">
+    <div class="coral-band">
+      <h2>Film favoritmu belum ketemu?</h2>
+      <p>Gunakan fitur pencarian untuk menemukan film dari seluruh dunia.</p>
+      <a href="/search" class="btn-secondary">Cari Film</a>
+    </div>
+  </div>
+
+  <!-- ===== EDITORIAL LIST (Variasi) ===== -->
+  <section class="section-band-alt">
+    <div class="container">
+      <h2 style="margin-bottom:var(--space-lg);">📰 Editor's Pick</h2>
+      <div class="editorial-list">
+        <% topRated.slice(0, 3).forEach((movie, i) => { %>
+          <a href="/movie/<%= movie.id %>" class="editorial-item" style="text-decoration:none;color:inherit;">
+            <span class="editorial-number"><%= i + 1 %></span>
+            <img src="https://image.tmdb.org/t/p/w92<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div>
+              <h4><%= movie.original_title %></h4>
+              <p><%= movie.overview?.slice(0, 80) %>...</p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== UPCOMING (Reel) ===== -->
+  <section class="section-band">
+    <div class="container">
+      <div class="section-header">
+        <h2>🎬 Coming Soon</h2>
+        <a href="/movies/upcoming" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="movie-reel">
+        <% upcoming.forEach(movie => { %>
+          <a href="/movie/<%= movie.id %>" class="movie-card">
+            <span class="badge badge-hd">HD</span>
+            <img src="https://image.tmdb.org/t/p/w185<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div class="movie-card-info">
+              <h3><%= movie.original_title %></h3>
+              <div class="meta">
+                <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TOP RATED ===== -->
+  <section class="section-band-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>🏆 Top Rated</h2>
+        <a href="/movies/top" class="see-all">Lihat semua →</a>
+      </div>
+      <div class="movie-grid">
+        <% topRated.forEach(movie => { %>
+          <a href="/movie/<%= movie.id %>" class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                 alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+            <div class="movie-card-info">
+              <h3><%= movie.original_title %></h3>
+              <div class="meta">
+                <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DARK BAND ===== -->
+  <div class="container">
+    <div class="dark-band">
+      <div>
+        <h2>Dapatkan Data Film Real-time</h2>
+        <p>Ditenagai oleh TMDB API — database film terbesar di dunia.</p>
+        <a href="/movies/discover" class="btn-dark" style="margin-top:var(--space-md);display:inline-block;">
+          Jelajahi Semua
+        </a>
+      </div>
+      <div class="code-block">
+        <span class="highlight">GET</span> /api/discover<br>
+        <span class="highlight">params:</span> {<br>
+        &nbsp;&nbsp;genre: <span class="string">"action"</span>,<br>
+        &nbsp;&nbsp;year: <span class="string">2024</span>,<br>
+        &nbsp;&nbsp;sort: <span class="string">"popularity.desc"</span><br>
+        }<br>
+        → <span class="highlight">200</span> OK
+      </div>
+    </div>
+  </div>
+
+  <%- include('footer') %>
+
+  <script>
+    const dots = document.querySelectorAll('.hero-dots button');
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
