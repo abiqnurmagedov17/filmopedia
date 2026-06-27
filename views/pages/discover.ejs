@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover — FilmPedia</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <%- include('../partials/header.ejs', { currentPage: 'discover' }) %>
+
+  <main>
+    <section class="section-band">
+      <div class="container">
+        <h1 style="margin-bottom:var(--space-lg);">🔍 Discover Movies</h1>
+
+        <!-- Filter Form -->
+        <form action="/movies/discover" method="GET" class="filter-form">
+          <select name="genre">
+            <option value="">All Genres</option>
+            <% genres.forEach(g => { %>
+              <option value="<%= g.id %>" <%= String(selectedGenre) === String(g.id) ? 'selected' : '' %>>
+                <%= g.name %>
+              </option>
+            <% }) %>
+          </select>
+
+          <select name="year">
+            <option value="">All Years</option>
+            <% const currentYear = new Date().getFullYear(); for (let y = currentYear; y >= 1970; y--) { %>
+              <option value="<%= y %>" <%= String(selectedYear) === String(y) ? 'selected' : '' %>>
+                <%= y %>
+              </option>
+            <% } %>
+          </select>
+
+          <select name="sort">
+            <option value="popularity.desc" <%= selectedSort === 'popularity.desc' ? 'selected' : '' %>>Popularity</option>
+            <option value="vote_average.desc" <%= selectedSort === 'vote_average.desc' ? 'selected' : '' %>>Rating</option>
+            <option value="release_date.desc" <%= selectedSort === 'release_date.desc' ? 'selected' : '' %>>Release Date</option>
+            <option value="title.asc" <%= selectedSort === 'title.asc' ? 'selected' : '' %>>Title A-Z</option>
+          </select>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn-primary">Filter</button>
+            <a href="/movies/discover" class="btn-secondary">Reset</a>
+          </div>
+        </form>
+
+        <!-- Results -->
+        <div class="movie-grid">
+          <% movies.forEach(movie => { %>
+            <a href="/movie/<%= movie.id %>" class="movie-card">
+              <img src="https://image.tmdb.org/t/p/w500<%= movie.poster_path %>" 
+                   alt="<%= movie.original_title %>" onerror="this.src='/placeholder.jpg'">
+              <div class="movie-card-info">
+                <h3><%= movie.original_title %></h3>
+                <div class="meta">
+                  <span class="rating">⭐ <%= movie.vote_average?.toFixed(1) || 'N/A' %></span>
+                  <span><%= movie.release_date?.slice(0,4) || 'TBA' %></span>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+
+        <% if (movies.length === 0) { %>
+          <div class="empty-state">
+            <div class="icon">🔎</div>
+            <h3>Tidak ada film ditemukan</h3>
+            <p>Coba ubah filter pencarian</p>
+          </div>
+        <% } %>
+
+        <% if (totalPages > 1) { %>
+          <div class="pagination">
+            <% for (let i = 1; i <= Math.min(totalPages, 10); i++) { %>
+              <a href="/movies/discover?page=<%= i %><%= selectedGenre ? '&genre=' + selectedGenre : '' %><%= selectedYear ? '&year=' + selectedYear : '' %><%= '&sort=' + selectedSort %>" 
+                 class="<%= i === currentPage ? 'active' : '' %>">
+                <%= i %>
+              </a>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../partials/footer.ejs') %>
+
+</body>
+</html>
