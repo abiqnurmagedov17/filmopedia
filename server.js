@@ -8,14 +8,14 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
-// Setup EJS
+// Setup EJS dengan folder views/pages dan views/partials
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== HELPER: FETCH TMDB =====
+// ===== HELPER =====
 async function fetchTMDB(endpoint, params = {}) {
   try {
     const response = await axios.get(`${TMDB_BASE}${endpoint}`, {
@@ -41,7 +41,7 @@ app.get('/', async (req, res) => {
       fetchTMDB('/movie/popular', { page: 1 })
     ]);
 
-    res.render('index', {
+    res.render('pages/index', {
       trending: trending?.results?.slice(0, 10) || [],
       nowPlaying: nowPlaying?.results?.slice(0, 4) || [],
       topRated: topRated?.results?.slice(0, 4) || [],
@@ -62,13 +62,14 @@ app.get('/movies/trending', async (req, res) => {
     const window = req.query.window === 'week' ? 'week' : 'day';
     const data = await fetchTMDB(`/trending/movie/${window}`, { page });
     
-    res.render('movies', {
+    res.render('pages/movies', {
       movies: data?.results?.slice(0, 8) || [],
       title: 'Trending',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
       basePath: '/movies/trending',
-      window: window
+      window: window,
+      isLoading: false
     });
   } catch (error) {
     console.error('Trending error:', error);
@@ -82,13 +83,14 @@ app.get('/movies/popular', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const data = await fetchTMDB('/movie/popular', { page });
     
-    res.render('movies', {
+    res.render('pages/movies', {
       movies: data?.results?.slice(0, 8) || [],
       title: 'Popular',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
       basePath: '/movies/popular',
-      window: 'day'
+      window: 'day',
+      isLoading: false
     });
   } catch (error) {
     console.error('Popular error:', error);
@@ -102,13 +104,14 @@ app.get('/movies/top', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const data = await fetchTMDB('/movie/top_rated', { page });
     
-    res.render('movies', {
+    res.render('pages/movies', {
       movies: data?.results?.slice(0, 8) || [],
       title: 'Top Rated',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
       basePath: '/movies/top',
-      window: 'day'
+      window: 'day',
+      isLoading: false
     });
   } catch (error) {
     console.error('Top Rated error:', error);
@@ -122,13 +125,14 @@ app.get('/movies/upcoming', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const data = await fetchTMDB('/movie/upcoming', { page });
     
-    res.render('movies', {
+    res.render('pages/movies', {
       movies: data?.results?.slice(0, 8) || [],
       title: 'Upcoming',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
       basePath: '/movies/upcoming',
-      window: 'day'
+      window: 'day',
+      isLoading: false
     });
   } catch (error) {
     console.error('Upcoming error:', error);
@@ -142,13 +146,14 @@ app.get('/movies/now-playing', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const data = await fetchTMDB('/movie/now_playing', { page });
     
-    res.render('movies', {
+    res.render('pages/movies', {
       movies: data?.results?.slice(0, 8) || [],
       title: 'Now Playing',
       currentPage: page,
       totalPages: Math.min(data?.total_pages || 1, 500),
       basePath: '/movies/now-playing',
-      window: 'day'
+      window: 'day',
+      isLoading: false
     });
   } catch (error) {
     console.error('Now Playing error:', error);
@@ -156,7 +161,7 @@ app.get('/movies/now-playing', async (req, res) => {
   }
 });
 
-// 7. DISCOVER (Filter)
+// 7. DISCOVER
 app.get('/movies/discover', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -173,7 +178,7 @@ app.get('/movies/discover', async (req, res) => {
       fetchTMDB('/genre/movie/list')
     ]);
     
-    res.render('discover', {
+    res.render('pages/discover', {
       movies: data?.results?.slice(0, 8) || [],
       genres: genres?.genres || [],
       currentPage: page,
@@ -208,7 +213,7 @@ app.get('/movie/:id', async (req, res) => {
       v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')
     ) || [];
 
-    res.render('movie', {
+    res.render('pages/movie', {
       movie,
       credits: credits || { cast: [], crew: [] },
       videos: trailers.slice(0, 6),
@@ -226,12 +231,12 @@ app.get('/search', async (req, res) => {
   const query = req.query.q?.trim();
   
   if (!query) {
-    return res.render('search', { movies: [], query: null });
+    return res.render('pages/search', { movies: [], query: null });
   }
 
   try {
     const data = await fetchTMDB('/search/movie', { query, page: 1 });
-    res.render('search', { 
+    res.render('pages/search', { 
       movies: data?.results || [], 
       query 
     });
