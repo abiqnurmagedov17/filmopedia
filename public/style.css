@@ -76,15 +76,13 @@ body {
   -moz-osx-font-smoothing:grayscale;
 }
 
-/* ===== TYPOGRAPHY ===== */
+/* ===== FLUID TYPOGRAPHY ===== */
 h1,h2,h3,h4 {
   font-family: var(--font-display);
   font-weight:400;
   color:var(--ink);
   letter-spacing:-0.02em;
 }
-
-/* ===== FLUID TYPOGRAPHY (Perbaikan #3) ===== */
 h1 { 
   font-size: clamp(32px, 5vw, 48px); 
   line-height: 1.05; 
@@ -455,7 +453,7 @@ a:hover { color:var(--primary-active); }
 .badge-hd { background:var(--surface-dark-elevated); color:var(--on-dark); border:1px solid rgba(255,255,255,0.1); }
 .badge-hot { background:#e74c3c; color:white; }
 
-/* ===== CARD INFO — LINE CLAMP (Perbaikan #1) ===== */
+/* ===== CARD INFO — LINE CLAMP ===== */
 .movie-card-info {
   padding:var(--space-md);
   position:relative;
@@ -900,56 +898,107 @@ a:hover { color:var(--primary-active); }
   .cast-item { flex: 0 0 80px; }
 }
 
-/* ===== RESPONSIVE DETAIL MOBILE (Perbaikan #4) ===== */
+/* ========================================
+   REVISI: MOVIE DETAIL KHUSUS MOBILE
+   ======================================== */
 @media (max-width:768px) {
-  .movie-detail { padding: 0; }
+  .movie-detail { 
+    padding: var(--space-md) 0; 
+  }
   
   .detail-layout {
     display: flex;
     flex-direction: column;
     padding: 0 var(--space-md);
-    gap: var(--space-md);
-    max-width: 100%;
+    gap: var(--space-sm); 
   }
   
+  /* 1. Poster lebih proporsional & menyatu dengan judul */
   .detail-poster {
-    max-width: 60%;
-    margin: var(--space-lg) auto 0;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    width: 160px;
+    max-width: 100%;
+    margin: 0 auto; 
     position: static;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border-radius: var(--radius-md);
   }
   
+  /* Container konten dipusatkan */
+  .detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .detail-content h1 {
+    font-size: 26px;
     text-align: center;
     margin-top: var(--space-sm);
+    margin-bottom: var(--space-xxs);
+    line-height: 1.2;
   }
   
   .detail-content .tagline {
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
+    margin-bottom: var(--space-md);
   }
   
   .detail-meta {
     font-size: 12px;
     gap: var(--space-sm);
     justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-md);
   }
   
+  /* Sinopsis tetap rata kiri agar mudah dibaca */
   .detail-content .overview {
     font-size: 14px;
-    text-align: left;
+    text-align: left; 
     line-height: 1.6;
+    width: 100%;
+    margin-top: var(--space-sm);
   }
   
-  .genre-tags { justify-content: center; }
-  .genre-tag { font-size: 11px; padding: 3px 10px; }
+  .genre-tags { 
+    justify-content: center; 
+    margin-bottom: var(--space-lg);
+  }
   
-  .cast-item { flex: 0 0 70px; }
+  /* 2. Cast bisa digeser (Smooth Swipe) */
+  .cast-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--space-md);
+    width: 100%;
+  }
+  .cast-item { 
+    flex: 0 0 76px; 
+  }
   .cast-item .name { font-size: 11px; }
   .cast-item .character { font-size: 10px; }
   
-  .trailer-grid { grid-template-columns: 1fr; }
-  .trailer-grid iframe { aspect-ratio: 16/9; }
+  /* 3. Trailer menjadi carousel horizontal (tidak raksasa) */
+  .trailer-grid { 
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: var(--space-md);
+    padding-bottom: var(--space-md);
+    width: 100%;
+  }
+  .trailer-grid iframe { 
+    flex: 0 0 80%;
+    aspect-ratio: 16/9;
+    height: auto;
+    scroll-snap-align: center;
+    border-radius: var(--radius-md);
+  }
 }
 
 /* ===== SEARCH ===== */
