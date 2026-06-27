@@ -83,3 +83,39 @@
                 <div class="movie-card-info">
                   <h3><%= m.original_title %></h3>
                   <div class="meta">
+                    <span class="rating">⭐ <%= m.vote_average?.toFixed(1) || 'N/A' %></span>
+                  </div>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <!-- Recommendations -->
+        <% if (recommendations.length) { %>
+          <h3 style="font-family:var(--font-display);font-weight:400;margin:var(--space-lg) 0 var(--space-md);">
+            💡 Rekomendasi
+          </h3>
+          <div class="movie-reel">
+            <% recommendations.slice(0, 8).forEach(m => { %>
+              <a href="/movie/<%= m.id %>" class="movie-card">
+                <img src="https://image.tmdb.org/t/p/w185<%= m.poster_path %>" 
+                     alt="<%= m.original_title %>" onerror="this.src='/placeholder.jpg'">
+                <div class="movie-card-info">
+                  <h3><%= m.original_title %></h3>
+                  <div class="meta">
+                    <span class="rating">⭐ <%= m.vote_average?.toFixed(1) || 'N/A' %></span>
+                  </div>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+  <%- include('footer') %>
+
+</body>
+</html>
